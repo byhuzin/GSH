@@ -1,0 +1,17 @@
+version: "3.1"
+
+rules:
+- rule: respond to greet
+  steps:
+    - intent: greet
+    - action: utter_greet
+
+- rule: respond to explicit help
+  steps:
+    - intent: ask_for_help
+    - action: utter_help
+
+- rule: handle low confidence fallback
+  steps:
+    - intent: nlu_fallback
+    - action: utter_nlu_fallback

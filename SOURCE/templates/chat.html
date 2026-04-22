@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة الخدمات الحكومية</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="app-shell">
+
+        <header class="topbar">
+
+            <div class="brand">
+                <div class="brand-text">
+                    <h1>بوابة الخدمات الحكومية</h1>
+                    <p>Government Services Hub</p>
+                </div>
+            </div>
+
+            <div class="topbar-left">
+                <a href="/admin/dashboard" class="nav-btn">لوحة التحكم</a>
+                <button id="theme-toggle" class="icon-btn">🌙</button>
+            </div>
+
+        </header>
+
+        <section class="welcome-banner">
+            <div class="welcome-text">
+                <h2>هلا، جيت اساعدك توصل لاي خدمة حكومية</h2>
+                <p>اسألني عن أي خدمة تبغاها، او اختر من قائمة الخدمات السريعة تحت</p>
+            </div>
+        </section>
+
+        <main class="main-layout">
+            <aside class="quick-services">
+                <div class="section-header">
+                    <h3>الخدمات الأكثر طلبًا</h3>
+                </div>
+
+                <div class="quick-grid">
+                    {% for service in quick_services %}
+                        <button class="quick-card" onclick="sendQuickMessage('{{ service['service_name'] }}')">
+                            <span class="quick-label">
+                                {{ service['service_name'] }}
+                            </span>
+                        </button>
+                    {% endfor %}
+                </div>
+            </aside>
+
+            <section class="chat-panel">
+                <div class="chat-box" id="chat-box">
+                    <div class="message bot-message">
+                        <div class="message-content">
+                            <p>هلا والله! ايش الخدمة اللي تبحث عنها؟</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-panel">
+                    <button class="send-btn" onclick="sendMessage()">إرسال</button>
+                    <input
+                        type="text"
+                        id="user-input"
+                        placeholder="اكتب سؤالك هنا..."
+                        onkeydown="handleKeyPress(event)"
+                    >
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/static/js/chat.js"></script>
+</body>
+</html>

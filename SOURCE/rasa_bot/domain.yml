@@ -1,0 +1,66 @@
+version: "3.1"
+
+intents:
+  - greet
+  - ask_for_help
+  - renew_national_id
+  - renew_driving_license
+  - issue_saudi_passport
+  - manage_national_address
+  - renew_saudi_passport
+  - university_registration
+  - document_divorce
+  - register_vat_individual
+  - issue_power_of_attorney
+  - cancel_sole_proprietorship_cr
+  - update_sole_proprietorship_cr
+  - annual_confirm_company_cr
+  - issue_residency_permit
+  - renew_residency_permit
+  - pay_government_violations
+  - register_newborn
+  - issue_death_certificate
+  - request_retirement_pension
+  - register_citizen_account
+  - premarital_medical_exam
+  - issue_damaged_id_replacement
+  - instant_medical_consultation
+  - report_work_injury
+  - terminate_employment_contract
+  - apply_jobs_jadarat
+  - apply_tamheer
+  - report_labor_violations
+  - issue_health_certificate
+  - renew_health_certificate
+  - issue_criminal_record_certificate
+  - issue_family_register_fathers
+  - attest_marriage_contract
+  - inventory_estate
+  - request_family_consultation
+  - document_will
+  - view_pay_electricity_bills
+  - issue_car_shade_permit
+  - object_traffic_violations
+  - authorize_vehicle
+  - drop_vehicle
+  - vehicle_sale_transfer
+  - report_cybercrime
+  - revoke_power_of_attorney
+  - report_financial_admin_corruption
+  - report_vat_violations
+  - contribute_farajat
+  - report_nuisance
+  - buy_zamzam
+  - issue_rawdah_permit
+  - quick_donation
+  - nlu_fallback
+
+responses:
+  utter_greet:
+    - text: "هلا! كيف اقدر اساعدك؟"
+
+  utter_help:
+    - text: "ابشر، وضّح لي الخدمة اللي تحتاجها، مثل: تجديد الهوية الوطنية او تجديد رخصة القيادة."
+
+  utter_nlu_fallback:
+    - text: "معليش، ما فهمت طلبك بشكل واضح. اكتب اسم الخدمة او نوع الطلب بشكل اوضح."

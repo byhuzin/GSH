@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="page-wrapper admin-page">
+        <div class="page-topbar">
+            <div class="page-title">
+                <h1>لوحة التحكم </h1>
+            </div>
+
+            <div class="page-actions">
+                <a href="/admin/services" class="primary-btn">إدارة الخدمات</a>
+                <a href="/" class="secondary-link">الرئيسية</a>
+                <a href="/admin/logout" class="secondary-link danger-link">تسجيل الخروج</a>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>عدد الرسائل</h3>
+                <p>{{ total_messages }}</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>عدد الخدمات</h3>
+                <p>{{ total_services }}</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>التقييم الإيجابي</h3>
+                <p>{{ positive_feedback }}</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>التقييم السلبي</h3>
+                <p>{{ negative_feedback }}</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>نسبة رضا المستخدم</h3>
+                <p>{{ satisfaction_rate }}%</p>
+            </div>
+        </div>
+
+        
+
+        <div class="table-card">
+            <div class="section-header">
+                <h3>الخدمات الأكثر طلبًا</h3>
+            </div>
+
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>الخدمة</th>
+                        <th>عدد الطلبات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if most_requested_services %}
+                        {% for item in most_requested_services %}
+                            <tr>
+                                <td>{{ item['service_name'] }}</td>
+                                <td>{{ item['request_count'] }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="2">لا توجد بيانات بعد</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إضافة خدمة</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="form-card">
+            <div class="page-title">
+                <h1>إضافة خدمة جديدة</h1>
+                <p>أدخل بيانات الخدمة بشكل كامل ليتم عرضها في النظام</p>
+            </div>
+
+            {% if error %}
+                <div class="alert-error">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST" class="styled-form">
+                <div class="form-group">
+                    <label>اسم الخدمة</label>
+                    <input type="text" name="service_name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>وصف الخدمة</label>
+                    <textarea name="service_description" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>المستندات المطلوبة</label>
+                    <textarea name="required_documents" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>الخطوات</label>
+                    <textarea name="steps" required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>الرسوم</label>
+                        <input type="text" id="fees" name="fees" required>
+                        <small id="fees-error" style="color: red; display: none;">
+                            يجب إدخال رقم فقط 
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>الوقت المقدر</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="estimated_time" name="estimated_time" required style="flex: 1;">
+                            <select id="estimated_time_unit" name="estimated_time_unit" style="flex: 1;">
+                                <option value="">اختر الوحدة</option>
+                                <option value="دقيقة">دقيقة</option>
+                                <option value="ساعة">ساعة</option>
+                                <option value="يوم">يوم</option>
+                            </select>
+                        </div>
+                        <small id="estimated-time-error" style="color: red; display: none;">
+                            يجب إدخال رقم فقط
+                        </small>
+                        <small id="estimated-time-unit-error" style="color: red; display: none;">
+                            يجب اختيار وحدة الوقت
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>رابط الخدمة</label>
+                    <input type="text" name="service_link">
+                </div>
+
+                <div class="form-group">
+                    <label>رابط تطبيق الآيفون</label>
+                    <input type="text" name="ios_link">
+                </div>
+
+                <div class="form-group">
+                    <label>رابط تطبيق الأندرويد</label>
+                    <input type="text" name="android_link">
+                </div>
+
+                <div class="form-group">
+                    <label>رابط الفيديو</label>
+                    <input type="text" name="video_link">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>التصنيف</label>
+                        <input type="text" name="category" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>اسم الـ Intent</label>
+                        <input type="text" name="intent_name" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>الكلمات المفتاحية</label>
+                    <input type="text" name="keywords" required>
+                </div>
+
+                <div class="page-actions">
+                    <button type="submit" class="primary-btn">حفظ الخدمة</button>
+                    <a href="/admin/services" class="secondary-link">العودة لإدارة الخدمات</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/service_validation.js"></script>
+    
+</body>
+</html>

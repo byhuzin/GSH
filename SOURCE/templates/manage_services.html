@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الخدمات</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="page-wrapper admin-page">
+        <div class="page-topbar">
+            <div class="page-title">
+                <h1>إدارة الخدمات</h1>
+                <p>عرض وتعديل وإضافة الخدمات المتاحة في النظام</p>
+            </div>
+
+            <div class="page-actions">
+                <a href="/admin/services/add" class="primary-btn">إضافة خدمة</a>
+                <a href="/admin/dashboard" class="secondary-link">لوحة التحكم</a>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>اسم الخدمة</th>
+                        <th>التصنيف</th>
+                        <th>اسم الـ Intent</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if services %}
+                        {% for service in services %}
+                            <tr>
+                                <td>{{ service['service_name'] }}</td>
+                                <td>{{ service['category'] }}</td>
+                                <td>{{ service['intent_name'] }}</td>
+                                <td class="actions-cell">
+                                    <a href="/admin/services/edit/{{ service['id'] }}" class="table-link">تعديل</a>
+                                    <a href="/admin/services/delete/{{ service['id'] }}"
+                                        class="delete-btn"
+                                        onclick="return confirm('هل أنت متأكد من حذف هذه الخدمة؟');">
+                                         حذف
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4">لا توجد خدمات متاحة</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
