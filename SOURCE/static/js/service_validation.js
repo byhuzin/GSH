@@ -30,17 +30,13 @@ document.addEventListener("DOMContentLoaded", function () {
         return true;
     }
 
-    // التحقق عند الخروج من الحقل
     feesInput.addEventListener("blur", validateFees);
 
-    // إخفاء الخطأ أثناء التصحيح
     feesInput.addEventListener("input", function () {
         if (feesInput.value.trim() === "" || isValidNumber(feesInput.value)) {
             feesError.style.display = "none";
         }
     });
-
-        // ===== Validation للوقت المقدر =====
 
     const estimatedTimeInput = document.getElementById("estimated_time");
     const estimatedTimeError = document.getElementById("estimated-time-error");
@@ -102,7 +98,6 @@ document.addEventListener("DOMContentLoaded", function () {
         estimatedTimeUnit.addEventListener("change", validateEstimatedTimeUnit);
     }
 
-    // تعديل submit الحالي
     form.addEventListener("submit", function (e) {
         const validFees = validateFees();
         const validTime = validateEstimatedTime();

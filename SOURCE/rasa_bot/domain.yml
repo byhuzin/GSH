@@ -1,6 +1,7 @@
 version: "3.1"
 
 intents:
+  - just_another_test
   - greet
   - ask_for_help
   - renew_national_id

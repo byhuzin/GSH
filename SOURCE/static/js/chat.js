@@ -16,7 +16,7 @@ function handleKeyPress(event) {
 
 function addUserMessage(text) {
     const wrapper = document.createElement("div");
-    wrapper.className = "message user-message no-avatar";
+    wrapper.className = "message user-message";
 
     wrapper.innerHTML = `
         <div class="message-content">
@@ -30,7 +30,7 @@ function addUserMessage(text) {
 
 function addBotMessage(htmlContent, messageId = null) {
     const wrapper = document.createElement("div");
-    wrapper.className = "message bot-message no-avatar";
+    wrapper.className = "message bot-message";
 
     let feedbackHtml = "";
     if (messageId) {
@@ -56,7 +56,7 @@ function addBotMessage(htmlContent, messageId = null) {
 
 function addTypingIndicator() {
     const wrapper = document.createElement("div");
-    wrapper.className = "message bot-message no-avatar";
+    wrapper.className = "message bot-message";
     wrapper.id = "typing-message";
 
     wrapper.innerHTML = `
@@ -115,6 +115,79 @@ function sendQuickMessage(text) {
     userInput.value = text;
     sendMessage();
 }
+
+
+let allServicesCache = [];
+
+async function loadAllServices() {
+    try {
+        const response = await fetch("/services/list");
+        allServicesCache = await response.json();
+    } catch (e) {
+        console.error("فشل تحميل قائمة الخدمات:", e);
+    }
+}
+
+function searchServices() {
+    const term = document.getElementById("services-search").value.trim().toLowerCase();
+    const quickSection = document.getElementById("quick-section");
+    const resultsSection = document.getElementById("search-results-section");
+    const resultsList = document.getElementById("search-results-list");
+    const noResults = document.getElementById("no-results");
+    const clearBtn = document.getElementById("search-clear");
+
+    clearBtn.style.display = term ? "flex" : "none";
+
+    if (!term) {
+        
+        resultsSection.style.display = "none";
+        quickSection.style.display = "";
+        return;
+    }
+
+    
+    quickSection.style.display = "none";
+    resultsSection.style.display = "";
+
+    const matches = allServicesCache.filter(service => {
+        const name = (service.name || "").toLowerCase();
+        const category = (service.category || "").toLowerCase();
+        return name.includes(term) || category.includes(term);
+    });
+
+    resultsList.innerHTML = "";
+
+    if (matches.length === 0) {
+        noResults.style.display = "";
+        return;
+    }
+
+    noResults.style.display = "none";
+
+    matches.forEach(service => {
+        const item = document.createElement("button");
+        item.className = "search-result-item";
+        item.onclick = () => {
+            sendQuickMessage(service.name);
+            clearServiceSearch();
+        };
+        item.innerHTML = `
+            <span class="result-name">${escapeHtml(service.name)}</span>
+            <span class="result-category">${escapeHtml(service.category || "")}</span>
+        `;
+        resultsList.appendChild(item);
+    });
+}
+
+function clearServiceSearch() {
+    const input = document.getElementById("services-search");
+    input.value = "";
+    searchServices();
+    input.focus();
+}
+
+loadAllServices();
+
 
 function applySavedTheme() {
     const savedTheme = localStorage.getItem("theme");

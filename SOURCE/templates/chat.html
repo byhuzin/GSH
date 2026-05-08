@@ -34,19 +34,52 @@
 
         <main class="main-layout">
             <aside class="quick-services">
-                <div class="section-header">
-                    <h3>الخدمات الأكثر طلبًا</h3>
+
+                <div class="sidebar-search">
+                    <div class="search-wrapper">
+                        <span class="search-icon">🔍</span>
+                        <input
+                            type="text"
+                            id="services-search"
+                            class="search-input"
+                            placeholder="ابحث عن خدمة..."
+                            oninput="searchServices()"
+                            autocomplete="off"
+                        >
+                        <button type="button" class="search-clear" id="search-clear" onclick="clearServiceSearch()" aria-label="مسح">×</button>
+                    </div>
                 </div>
 
-                <div class="quick-grid">
-                    {% for service in quick_services %}
-                        <button class="quick-card" onclick="sendQuickMessage('{{ service['service_name'] }}')">
-                            <span class="quick-label">
-                                {{ service['service_name'] }}
-                            </span>
-                        </button>
-                    {% endfor %}
+                <div id="quick-section">
+                    <div class="section-header">
+                        <h3>الخدمات الأكثر طلبًا</h3>
+                    </div>
+
+                    <div class="search-results-list">
+                        {% for service in quick_services %}
+                            <button
+                                class="search-result-item"
+                                data-name="{{ service['service_name'] }}"
+                                onclick="sendQuickMessage(this.dataset.name)"
+                            >
+                                <span class="result-name">{{ service['service_name'] }}</span>
+                                <span class="result-category">{{ service['category'] if service['category'] else '' }}</span>
+                            </button>
+                        {% endfor %}
+                    </div>
                 </div>
+
+                <div id="search-results-section" style="display:none;">
+                    <div class="section-header">
+                        <h3>نتائج البحث</h3>
+                    </div>
+                    <div class="search-results-list" id="search-results-list">
+                    </div>
+                    <div class="no-results" id="no-results" style="display:none;">
+                        لا توجد خدمات مطابقة
+                    </div>
+                </div>
+
             </aside>
 
             <section class="chat-panel">

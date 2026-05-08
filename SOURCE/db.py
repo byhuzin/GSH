@@ -1,8 +1,9 @@
 import sqlite3
 from contextlib import closing
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
-DB_NAME = "../DATABASE/government_services.db"
+DB_NAME = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "DATABASE", "government_services.db")
 
 
 def get_connection():
@@ -78,17 +79,17 @@ def add_new_columns():
         with conn:
             try:
                 conn.execute("ALTER TABLE services ADD COLUMN ios_link TEXT")
-            except:
+            except sqlite3.OperationalError:
                 pass
 
             try:
                 conn.execute("ALTER TABLE services ADD COLUMN android_link TEXT")
-            except:
+            except sqlite3.OperationalError:
                 pass
 
             try:
                 conn.execute("ALTER TABLE services ADD COLUMN estimated_time_unit TEXT")
-            except:
+            except sqlite3.OperationalError:
                 pass
 
 
@@ -250,8 +251,7 @@ def save_message(session_id: str, user_message: str, detected_intent: str = None
                 )
                 VALUES (?, ?, ?, ?, ?)
             """, (session_id, user_message, detected_intent, service_id, bot_response))
-
-    return cursor.lastrowid
+            return cursor.lastrowid
 
 
 def save_feedback(session_id: str, message_id: int, rating: int, comment: str = ""):
@@ -315,11 +315,11 @@ def get_dashboard_stats():
 def get_top_requested_services(limit=6):
     with closing(get_connection()) as conn:
         services = conn.execute("""
-            SELECT s.service_name, s.intent_name
+            SELECT s.service_name, s.intent_name, s.category
             FROM messages m
             JOIN services s ON m.service_id = s.id
             WHERE m.service_id IS NOT NULL AND s.is_active = 1
-            GROUP BY s.id, s.service_name, s.intent_name
+            GROUP BY s.id, s.service_name, s.intent_name, s.category
             ORDER BY COUNT(m.id) DESC
             LIMIT ?
         """, (limit,)).fetchall()
@@ -335,3 +335,19 @@ def get_service_by_name(service_name):
         """, (service_name,)).fetchone()
 
     return service
+
+def search_services(query: str, limit: int = 8):
+    with closing(get_connection()) as conn:
+        services = conn.execute("""
+            SELECT id, service_name, category, intent_name
+            FROM services
+            WHERE is_active = 1
+              AND (
+                service_name LIKE ?
+                OR keywords LIKE ?
+                OR service_description LIKE ?
+              )
+            ORDER BY service_name
+            LIMIT ?
+        """, (f"%{query}%", f"%{query}%", f"%{query}%", limit)).fetchall()
+    return services
