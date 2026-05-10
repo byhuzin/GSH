@@ -176,6 +176,26 @@ def get_service_by_intent(intent_name: str):
     return service
 
 
+def intent_name_exists(intent_name, exclude_service_id=None):
+    with closing(get_connection()) as conn:
+        if exclude_service_id:
+            service = conn.execute("""
+                SELECT * FROM services
+                WHERE intent_name = ?
+                AND id != ?
+                LIMIT 1
+            """, (intent_name, exclude_service_id)).fetchone()
+        else:
+            service = conn.execute("""
+                SELECT * FROM services
+                WHERE intent_name = ?
+                LIMIT 1
+            """, (intent_name,)).fetchone()
+    if service:
+        return True
+    return False
+
+
 def get_service_by_id(service_id: int):
     with closing(get_connection()) as conn:
         service = conn.execute("""

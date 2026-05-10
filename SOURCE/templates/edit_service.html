@@ -97,7 +97,10 @@
 
                     <div class="form-group">
                         <label>اسم الـ Intent</label>
-                        <input type="text" name="intent_name" value="{{ service['intent_name'] }}" required>
+                        <input type="text" id="intent_name" name="intent_name" value="{{ service['intent_name'] }}" data-service-id="{{ service['id'] }}" readonly style="background-color: #f0f0f0; cursor: not-allowed;">
+                        <small id="intent-name-error" style="color: red; display: none;">
+                            يجب ان يتكون اسم ال Intent من أحرف إنجليزية فقط
+                        </small>
                     </div>
                 </div>
 

@@ -18,7 +18,8 @@ from db import (
     save_feedback,
     get_service_by_name,
     get_top_requested_services,
-    search_services
+    search_services,
+    intent_name_exists
 )
 from rasa_sync import sync_service_to_rasa
 
@@ -334,6 +335,25 @@ def admin_dashboard():
 def manage_services():
     services = get_all_services()
     return render_template("manage_services.html", services=services)
+
+
+@app.route("/admin/services/check-intent")
+@admin_required
+def check_service_intent_name():
+
+    intent_name = request.args.get("intent_name", "").strip()
+    service_id = request.args.get("service_id", type=int)
+
+    if not intent_name:
+        return jsonify({
+            "exists": False
+        })
+
+    exists = intent_name_exists(intent_name,service_id)
+
+    return jsonify({
+        "exists": exists
+    })
 
 
 @app.route("/admin/services/add", methods=["GET", "POST"])

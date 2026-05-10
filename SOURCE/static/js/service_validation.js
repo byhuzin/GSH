@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
     const feesInput = document.getElementById("fees");
     const feesError = document.getElementById("fees-error");
+    const intentNameInput = document.getElementById("intent_name");
+    const intentNameError = document.getElementById("intent-name-error");
     const form = document.querySelector("form");
 
     if (!feesInput || !feesError || !form) return;
@@ -81,6 +83,60 @@ document.addEventListener("DOMContentLoaded", function () {
         return true;
     }
 
+    function isValidIntentName(value) {
+        return /^[A-Za-z][A-Za-z0-9_]*$/.test(value.trim());
+    }
+
+    function validateIntentNameFormat() {
+        if (!intentNameInput || !intentNameError) return true;
+
+        const value = intentNameInput.value.trim();
+
+        if (value === "") {
+            intentNameError.textContent = "هذا الحقل مطلوب";
+            intentNameError.style.display = "block";
+            return false;
+        }
+
+        if (!isValidIntentName(value)) {
+            intentNameError.textContent = "يجب ان يتكون اسم ال Intent من أحرف إنجليزية فقط";
+            intentNameError.style.display = "block";
+            return false;
+        }
+
+        intentNameError.style.display = "none";
+        return true;
+    }
+
+    async function validateIntentName() {
+        if (!validateIntentNameFormat()) {
+            return false;
+        }
+
+        let url ="/admin/services/check-intent?intent_name=" + encodeURIComponent(intentNameInput.value.trim());
+        const serviceId = intentNameInput.dataset.serviceId;
+        if (serviceId) {
+            url += "&service_id=" + serviceId;
+        }
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            if (data.exists) {
+                intentNameError.textContent ="اسم الـ Intent مستخدم مسبقًا";
+                intentNameError.style.display = "block";
+                return false;
+            }
+            intentNameError.style.display = "none";
+            return true;
+
+        } catch (error) {
+            intentNameError.textContent ="تعذر التحقق من اسم الـ Intent، حاول مرة أخرى";
+            intentNameError.style.display = "block";
+            return false;
+        }
+    }
+
     if (estimatedTimeInput) {
         estimatedTimeInput.addEventListener("blur", validateEstimatedTime);
 
@@ -98,17 +154,53 @@ document.addEventListener("DOMContentLoaded", function () {
         estimatedTimeUnit.addEventListener("change", validateEstimatedTimeUnit);
     }
 
-    form.addEventListener("submit", function (e) {
+    if (intentNameInput) {
+        intentNameInput.addEventListener("blur", validateIntentName);
+
+        intentNameInput.addEventListener("input", function () {
+            if (intentNameInput.value.trim() === "" || isValidIntentName(intentNameInput.value)) {
+                intentNameError.style.display = "none";
+            }
+        });
+    }
+
+    form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
         const validFees = validateFees();
         const validTime = validateEstimatedTime();
         const validUnit = validateEstimatedTimeUnit();
+        const validIntentNameFormat = validateIntentNameFormat();
 
-        if (!validFees || !validTime || !validUnit) {
-            e.preventDefault();
+        if (!validFees || !validTime || !validUnit || !validIntentNameFormat) {
 
-            if (!validFees) feesInput.focus();
-            else if (!validTime) estimatedTimeInput.focus();
-            else if (!validUnit) estimatedTimeUnit.focus();
+            if (!validFees) {
+                feesInput.focus();
+            }
+
+            else if (!validTime) {
+                estimatedTimeInput.focus();
+            }
+
+            else if (!validUnit) {
+                estimatedTimeUnit.focus();
+            }
+
+            else if (!validIntentNameFormat) {
+                intentNameInput.focus();
+            }
+
+            return;
         }
+
+        const validIntentName = await validateIntentName();
+
+        if (!validIntentName) {
+            intentNameInput.focus();
+            return;
+        }
+
+        form.submit();
+
     });
 });
