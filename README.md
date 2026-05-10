@@ -162,11 +162,21 @@ Then log in at `http://127.0.0.1:5000/admin/login`.
 
 ### 📸 Project Screenshots
 
-> *(Add your screenshots or GIFs here)*
+**Chatbot Interface**
 
-| Chatbot Interface | Admin Dashboard |
+| Home Page | Conversation | Feedback |
+|---|---|---|
+| ![Chat Home](screenshots/chat_home.png) | ![Chat Conversation](screenshots/chat_conversation.png) | ![Chat Feedback](screenshots/chat_feedback.png) |
+
+**Admin Panel**
+
+| Login | Dashboard | Manage Services |
+|---|---|---|
+| ![Admin Login](screenshots/admin_login.png) | ![Admin Dashboard](screenshots/admin_dashboard.png) | ![Admin Services](screenshots/admin_services.png) |
+
+| Add Service | Edit Service |
 |---|---|
-| ![Chatbot](screenshots/chatbot.png) | ![Dashboard](screenshots/dashboard.png) |
+| ![Add Service](screenshots/admin_add_service.png) | ![Edit Service](screenshots/admin_edit_service.png) |
 
 ### 👥 Team Members
 
@@ -340,11 +350,21 @@ create_admin("admin", "your_password")
 
 ### 📸 لقطات من المشروع
 
-> *(أضف صور المشروع أو فيديو قصير بصيغة GIF هنا)*
+**واجهة المحادثة**
 
-| واجهة المحادثة | لوحة التحكم الإدارية |
+| الصفحة الرئيسية | محادثة كاملة | نموذج التقييم |
+|---|---|---|
+| ![Chat Home](screenshots/chat_home.png) | ![Chat Conversation](screenshots/chat_conversation.png) | ![Chat Feedback](screenshots/chat_feedback.png) |
+
+**لوحة الإدارة**
+
+| تسجيل الدخول | الإحصائيات | إدارة الخدمات |
+|---|---|---|
+| ![Admin Login](screenshots/admin_login.png) | ![Admin Dashboard](screenshots/admin_dashboard.png) | ![Admin Services](screenshots/admin_services.png) |
+
+| إضافة خدمة | تعديل خدمة |
 |---|---|
-| ![Chatbot](screenshots/chatbot.png) | ![Dashboard](screenshots/dashboard.png) |
+| ![Add Service](screenshots/admin_add_service.png) | ![Edit Service](screenshots/admin_edit_service.png) |
 
 ### 👥 فريق العمل
 
