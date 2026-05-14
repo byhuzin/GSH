@@ -216,6 +216,34 @@ def get_service_by_id(service_id: int):
     return service
 
 
+def get_service_usage_stats(service_id: int):
+    with closing(get_connection()) as conn:
+        stats = conn.execute("""
+            SELECT
+                COUNT(m.id) AS request_count,
+                COALESCE(SUM(CASE WHEN f.rating = 1 THEN 1 ELSE 0 END), 0) AS positive_feedback,
+                COALESCE(SUM(CASE WHEN f.rating = 0 THEN 1 ELSE 0 END), 0) AS negative_feedback,
+                COUNT(f.id) AS total_feedback
+            FROM messages m
+            LEFT JOIN feedback f ON f.message_id = m.id
+            WHERE m.service_id = ?
+        """, (service_id,)).fetchone()
+
+    total_feedback = stats["total_feedback"]
+    satisfaction_rate = 0
+
+    if total_feedback > 0:
+        satisfaction_rate = round((stats["positive_feedback"] / total_feedback) * 100, 2)
+
+    return {
+        "request_count": stats["request_count"],
+        "positive_feedback": stats["positive_feedback"],
+        "negative_feedback": stats["negative_feedback"],
+        "total_feedback": total_feedback,
+        "satisfaction_rate": satisfaction_rate
+    }
+
+
 def update_service(service_id: int, service_data: dict):
     with closing(get_connection()) as conn:
         with conn:

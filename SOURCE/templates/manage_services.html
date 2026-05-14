@@ -7,71 +7,129 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <div class="page-wrapper admin-page">
-        <div class="page-topbar">
+    <div class="page-wrapper admin-page services-admin-page">
+        <div class="page-topbar modern-topbar">
             <div class="page-title">
+                <span class="eyebrow">مركز التحكم</span>
                 <h1>إدارة الخدمات</h1>
-                <p>عرض وتعديل وإضافة الخدمات المتاحة في النظام</p>
+                <p>تحكم سريع في الخدمات، حالتها، وتصنيفاتها من واجهة واحدة.</p>
             </div>
 
             <div class="page-actions">
                 <a href="/admin/services/add" class="primary-btn">إضافة خدمة</a>
-                <a href="/admin/dashboard" class="secondary-link">لوحة التحكم</a>
+                <a href="/admin/dashboard" class="secondary-btn">لوحة التحكم</a>
             </div>
         </div>
 
-        <div class="table-card">
-            <table class="styled-table">
-                <thead>
-                    <tr>
-                        <th>اسم الخدمة</th>
-                        <th>التصنيف</th>
-                        <th>اسم الـ Intent</th>
-                        <th>حالة الخدمة</th>
-                        <th>الإجراءات</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if services %}
-                        {% for service in services %}
-                            <tr>
-                                <td>{{ service['service_name'] }}</td>
-                                <td>{{ service['category'] }}</td>
-                                <td>{{ service['intent_name'] }}</td>
-                                <td>
-                                    {% if service['is_active'] == 1 %}
-                                        <span class="status-badge active">نشطة</span>
-                                    {% else %}
-                                        <span class="status-badge inactive">معطلة</span>
-                                    {% endif %}
-                                </td>
-                                <td class="actions-cell">
-                                    <a href="/admin/services/edit/{{ service['id'] }}" class="table-link">تعديل</a>
-                                    {% if service['is_active'] == 1 %}
-                                        <form method="POST" action="/admin/services/{{ service['id'] }}/status/0" class="inline-action-form">
-                                            <button type="submit" class="status-action-btn deactivate-btn"
-                                                onclick="return confirm('هل أنت متأكد من تعطيل هذه الخدمة؟');">
-                                                تعطيل
-                                            </button>
-                                        </form>
-                                    {% else %}
-                                        <form method="POST" action="/admin/services/{{ service['id'] }}/status/1" class="inline-action-form">
-                                            <button type="submit" class="status-action-btn activate-btn">
-                                                تنشيط
-                                            </button>
-                                        </form>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
+        <div class="services-summary-grid">
+            <div class="mini-stat">
+                <span>إجمالي الخدمات</span>
+                <strong>{{ total_services_count }}</strong>
+            </div>
+            <div class="mini-stat">
+                <span>نشطة</span>
+                <strong>{{ active_services_count }}</strong>
+            </div>
+            <div class="mini-stat">
+                <span>معطلة</span>
+                <strong>{{ inactive_services_count }}</strong>
+            </div>
+        </div>
+
+        <div class="services-control-panel">
+            <div class="control-search">
+                <span>بحث</span>
+                <input type="search" id="servicesSearch" placeholder="اسم الخدمة، التصنيف، أو Intent">
+            </div>
+
+            <div class="segmented-control" aria-label="تصفية الخدمات">
+                <button type="button" class="segment active" data-filter="all">الكل</button>
+                <button type="button" class="segment" data-filter="active">نشطة</button>
+                <button type="button" class="segment" data-filter="inactive">معطلة</button>
+            </div>
+
+            <select id="servicesSort" class="modern-select" aria-label="ترتيب الخدمات">
+                <option value="latest">الأحدث إضافة</option>
+                <option value="name">اسم الخدمة</option>
+                <option value="category">التصنيف</option>
+                <option value="status">الحالة</option>
+            </select>
+        </div>
+
+        <div class="table-card modern-table-card">
+            <div class="table-toolbar">
+                <div>
+                    <h2>قائمة الخدمات</h2>
+                    <p id="servicesVisibleCount">{{ total_services_count }} خدمة</p>
+                </div>
+            </div>
+
+            <div class="responsive-table-wrap">
+                <table class="styled-table services-admin-table">
+                    <thead>
                         <tr>
-                            <td colspan="5">لا توجد خدمات في النظام</td>
+                            <th>الخدمة</th>
+                            <th>التصنيف</th>
+                            <th>Intent</th>
+                            <th>الحالة</th>
+                            <th>آخر تحديث</th>
+                            <th>الإجراءات</th>
                         </tr>
-                    {% endif %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody id="servicesTableBody">
+                        {% if services %}
+                            {% for service in services %}
+                                <tr class="service-row"
+                                    data-name="{{ service['service_name'] }}"
+                                    data-category="{{ service['category'] or '' }}"
+                                    data-intent="{{ service['intent_name'] }}"
+                                    data-status="{% if service['is_active'] == 1 %}active{% else %}inactive{% endif %}"
+                                    data-id="{{ service['id'] }}">
+                                    <td>
+                                        <div class="service-cell-title">
+                                            <strong>{{ service['service_name'] }}</strong>
+                                            <span>{{ service['service_description'][:90] }}{% if service['service_description']|length > 90 %}...{% endif %}</span>
+                                        </div>
+                                    </td>
+                                    <td>{{ service['category'] or 'بدون تصنيف' }}</td>
+                                    <td><code class="intent-chip">{{ service['intent_name'] }}</code></td>
+                                    <td>
+                                        {% if service['is_active'] == 1 %}
+                                            <span class="status-badge active">نشطة</span>
+                                        {% else %}
+                                            <span class="status-badge inactive">معطلة</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ service['updated_at'] or service['created_at'] }}</td>
+                                    <td class="actions-cell">
+                                        <a href="/admin/services/edit/{{ service['id'] }}" class="table-action-btn edit-action">تعديل</a>
+                                        {% if service['is_active'] == 1 %}
+                                            <form method="POST" action="/admin/services/{{ service['id'] }}/status/0" class="inline-action-form">
+                                                <button type="submit" class="table-action-btn deactivate-action" data-confirm="هل تريد تعطيل هذه الخدمة؟">
+                                                    تعطيل
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            <form method="POST" action="/admin/services/{{ service['id'] }}/status/1" class="inline-action-form">
+                                                <button type="submit" class="table-action-btn activate-action">
+                                                    تنشيط
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="servicesEmptyState" class="modern-empty-state">
+                لا توجد خدمات مطابقة للبحث أو الفلتر الحالي.
+            </div>
         </div>
     </div>
+
+    <script src="/static/js/services_admin.js"></script>
 </body>
 </html>

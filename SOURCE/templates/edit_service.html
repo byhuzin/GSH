@@ -4,120 +4,246 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تعديل الخدمة</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/style.css?v=forms-required-20260514">
 </head>
 <body>
-    <div class="page-wrapper">
-        <div class="form-card">
+    <div class="page-wrapper service-form-page">
+        <div class="page-topbar modern-topbar">
             <div class="page-title">
+                <span class="eyebrow">تحديث خدمة</span>
                 <h1>تعديل الخدمة</h1>
-                <p>يمكنك تعديل بيانات الخدمة ثم حفظ التحديثات</p>
+                <p>راجع البيانات، عدّل التفاصيل، وتابع أثر الخدمة من نفس الصفحة.</p>
             </div>
 
-            {% if error %}
-                <div class="alert-error">{{ error }}</div>
-            {% endif %}
-
-            <form method="POST" class="styled-form">
-                <div class="form-group">
-                    <label>اسم الخدمة</label>
-                    <input type="text" name="service_name" value="{{ service['service_name'] }}" required>
-                </div>
-
-                <div class="form-group">
-                    <label>وصف الخدمة</label>
-                    <textarea name="service_description" required>{{ service['service_description'] }}</textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>المستندات المطلوبة</label>
-                    <textarea name="required_documents" required>{{ service['required_documents'] }}</textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>الخطوات</label>
-                    <textarea name="steps" required>{{ service['steps'] }}</textarea>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>الرسوم</label>
-                        <input type="text" id="fees" name="fees" value="{{ service['fees'] }}" required>
-                        <small id="fees-error" style="color: red; display: none;">
-                            يجب إدخال رقم فقط
-                        </small>
-                    </div>
-
-                    <div class="form-group">
-                        <label>الوقت المقدر</label>
-                        <div style="display: flex; gap: 10px;">
-                            <input type="text" id="estimated_time" name="estimated_time" value="{{ service['estimated_time'] }}" required style="flex: 1;">
-
-                            <select id="estimated_time_unit" name="estimated_time_unit" style="flex: 1;">
-                                <option value="">اختر الوحدة</option>
-                                <option value="دقيقة" {% if service['estimated_time_unit'] == 'دقيقة' %}selected{% endif %}>دقيقة</option>
-                                <option value="ساعة" {% if service['estimated_time_unit'] == 'ساعة' %}selected{% endif %}>ساعة</option>
-                                <option value="يوم" {% if service['estimated_time_unit'] == 'يوم' %}selected{% endif %}>يوم</option>
-                            </select>
-                        </div>
-                        <small id="estimated-time-error" style="color: red; display: none;">
-                            يجب إدخال رقم فقط
-                        </small>
-                        <small id="estimated-time-unit-error" style="color: red; display: none;">
-                            يجب اختيار وحدة الوقت
-                        </small>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>رابط الخدمة</label>
-                    <input type="text" name="service_link" value="{{ service['service_link'] or '' }}">
-                </div>
-
-                <div class="form-group">
-                    <label>رابط تطبيق الآيفون</label>
-                    <input type="text" name="ios_link" value="{{ service['ios_link'] or '' }}">
-                </div>
-
-                <div class="form-group">
-                    <label>رابط تطبيق الأندرويد</label>
-                    <input type="text" name="android_link" value="{{ service['android_link'] or '' }}">
-                </div>
-
-                <div class="form-group">
-                    <label>رابط الفيديو</label>
-                    <input type="text" name="video_link" value="{{ service['video_link'] or '' }}">
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>التصنيف</label>
-                        <input type="text" name="category" value="{{ service['category'] }}" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>اسم الـ Intent</label>
-                        <input type="text" id="intent_name" name="intent_name" value="{{ service['intent_name'] }}" data-service-id="{{ service['id'] }}" readonly style="background-color: #f0f0f0; cursor: not-allowed;">
-                        <small id="intent-name-error" style="color: red; display: none;">
-                            يجب ان يتكون اسم ال Intent من أحرف إنجليزية فقط
-                        </small>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>الكلمات المفتاحية</label>
-                    <input type="text" name="keywords" value="{{ service['keywords'] }}" required>
-                </div>
-
-                <div class="page-actions">
-                    <button type="submit" class="primary-btn">حفظ التعديلات</button>
-                    <a href="/admin/services" class="secondary-link">العودة لإدارة الخدمات</a>
-                </div>
-            </form>
+            <div class="page-actions">
+                {% if service['is_active'] == 1 %}
+                    <span class="status-badge active">نشطة</span>
+                {% else %}
+                    <span class="status-badge inactive">معطلة</span>
+                {% endif %}
+                <a href="/admin/services" class="secondary-btn">إدارة الخدمات</a>
+            </div>
         </div>
+
+        {% if error %}
+            <div class="alert-error">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" class="service-workspace" data-service-form data-track-changes>
+            <div class="form-main-panel">
+                <section class="form-section" data-section="basic">
+                    <div class="form-section-header">
+                        <span>01</span>
+                        <div>
+                            <h2>المعلومات الأساسية</h2>
+                            <p>أي تعديل هنا ينعكس على ظهور الخدمة في نتائج الشات.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group required-field">
+                        <label>اسم الخدمة <span class="required-mark">مطلوب</span></label>
+                        <input type="text" name="service_name" value="{{ service['service_name'] }}" data-preview="name" required>
+                    </div>
+
+                    <div class="form-group required-field">
+                        <label>وصف الخدمة <span class="required-mark">مطلوب</span></label>
+                        <textarea name="service_description" data-preview="description" required>{{ service['service_description'] }}</textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group required-field">
+                            <label>التصنيف <span class="required-mark">مطلوب</span></label>
+                            <input type="text" name="category" value="{{ service['category'] }}" data-preview="category" required>
+                        </div>
+
+                        <div class="form-group required-field">
+                            <label>اسم الـ Intent <span class="required-mark">مطلوب</span></label>
+                            <input type="text" id="intent_name" name="intent_name" value="{{ service['intent_name'] }}" data-service-id="{{ service['id'] }}" readonly>
+                            <small id="intent-name-error" class="field-error">
+                                يجب أن يبدأ اسم الـ Intent بحرف إنجليزي ويحتوي على أحرف إنجليزية وأرقام وشرطة سفلية فقط
+                            </small>
+                            <small class="field-hint">تم قفل الـ Intent للحفاظ على استقرار بيانات Rasa.</small>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="form-section" data-section="requirements">
+                    <div class="form-section-header">
+                        <span>02</span>
+                        <div>
+                            <h2>المتطلبات والخطوات</h2>
+                            <p>اكتب كل مستند أو خطوة في سطر مستقل لتحسين العرض داخل الشات.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group required-field">
+                        <label>المستندات المطلوبة <span class="required-mark">مطلوب</span></label>
+                        <textarea name="required_documents" data-preview="documents" required>{{ service['required_documents'] }}</textarea>
+                    </div>
+
+                    <div class="form-group required-field">
+                        <label>الخطوات <span class="required-mark">مطلوب</span></label>
+                        <textarea name="steps" data-preview="steps" required>{{ service['steps'] }}</textarea>
+                    </div>
+                </section>
+
+                <section class="form-section" data-section="details">
+                    <div class="form-section-header">
+                        <span>03</span>
+                        <div>
+                            <h2>التكلفة والمدة</h2>
+                            <p>حافظ على لغة واضحة ومباشرة للمستخدم النهائي.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group required-field">
+                            <label>الرسوم <span class="required-mark">مطلوب</span></label>
+                            <input type="text" id="fees" name="fees" value="{{ service['fees'] }}" data-preview="fees" required>
+                            <small id="fees-error" class="field-error">يجب إدخال رقم فقط</small>
+                        </div>
+
+                        <div class="form-group required-field">
+                            <label>الوقت المقدر <span class="required-mark">مطلوب</span></label>
+                            <div class="inline-fields">
+                                <input type="text" id="estimated_time" name="estimated_time" value="{{ service['estimated_time'] }}" data-preview="time" required>
+                                <select id="estimated_time_unit" name="estimated_time_unit" data-preview="timeUnit">
+                                    <option value="">الوحدة</option>
+                                    <option value="دقيقة" {% if service['estimated_time_unit'] == 'دقيقة' %}selected{% endif %}>دقيقة</option>
+                                    <option value="ساعة" {% if service['estimated_time_unit'] == 'ساعة' %}selected{% endif %}>ساعة</option>
+                                    <option value="يوم" {% if service['estimated_time_unit'] == 'يوم' %}selected{% endif %}>يوم</option>
+                                </select>
+                            </div>
+                            <small id="estimated-time-error" class="field-error">يجب إدخال رقم فقط</small>
+                            <small id="estimated-time-unit-error" class="field-error">يجب اختيار وحدة الوقت</small>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="form-section" data-section="links">
+                    <div class="form-section-header">
+                        <span>04</span>
+                        <div>
+                            <h2>الروابط والقنوات</h2>
+                            <p>راجع الروابط الرسمية قبل حفظ التحديثات.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label>رابط الخدمة</label>
+                            <input type="url" name="service_link" value="{{ service['service_link'] or '' }}" placeholder="https://">
+                        </div>
+
+                        <div class="form-group">
+                            <label>رابط تطبيق الآيفون</label>
+                            <input type="url" name="ios_link" value="{{ service['ios_link'] or '' }}" placeholder="https://">
+                        </div>
+
+                        <div class="form-group">
+                            <label>رابط تطبيق الأندرويد</label>
+                            <input type="url" name="android_link" value="{{ service['android_link'] or '' }}" placeholder="https://">
+                        </div>
+
+                        <div class="form-group">
+                            <label>رابط الفيديو</label>
+                            <input type="url" name="video_link" value="{{ service['video_link'] or '' }}" placeholder="https://">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="form-section" data-section="bot">
+                    <div class="form-section-header">
+                        <span>05</span>
+                        <div>
+                            <h2>كلمات البوت المفتاحية</h2>
+                            <p>تحديث الكلمات المفتاحية يعيد مزامنة Rasa بعد الحفظ.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group required-field">
+                        <label>الكلمات المفتاحية <span class="required-mark">مطلوب</span></label>
+                        <input type="text" name="keywords" value="{{ service['keywords'] }}" data-keywords-input required>
+                        <div class="keyword-tags" data-keyword-tags></div>
+                    </div>
+                </section>
+
+                <div class="sticky-form-actions">
+                    <button type="submit" class="primary-btn">حفظ التعديلات</button>
+                    <button type="button" class="secondary-btn" data-reset-form>إعادة التعيين</button>
+                    <a href="/admin/services" class="secondary-link">إلغاء</a>
+                    <span id="unsavedChangesNotice" class="changes-notice">توجد تغييرات غير محفوظة</span>
+                </div>
+            </div>
+
+            <aside class="form-side-panel">
+                <div class="progress-card service-health-card">
+                    <div class="service-health-grid">
+                        <div>
+                            <span>الطلبات</span>
+                            <strong>{{ service_stats['request_count'] }}</strong>
+                        </div>
+                        <div>
+                            <span>الإيجابي</span>
+                            <strong>{{ service_stats['positive_feedback'] }}</strong>
+                        </div>
+                        <div>
+                            <span>السلبي</span>
+                            <strong>{{ service_stats['negative_feedback'] }}</strong>
+                        </div>
+                        <div>
+                            <span>الرضا</span>
+                            <strong>{{ service_stats['satisfaction_rate'] }}%</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-card">
+                    <div class="metric-line">
+                        <span>اكتمال البيانات</span>
+                        <strong id="formProgressLabel">0%</strong>
+                    </div>
+                    <div class="progress-track">
+                        <div id="formProgressBar" class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="preview-card">
+                    <div class="section-header compact">
+                        <h3>معاينة الرد</h3>
+                    </div>
+                    <div class="chat-preview-card">
+                        <h3 id="previewName">اسم الخدمة</h3>
+                        <p id="previewDescription">سيظهر وصف الخدمة هنا أثناء الكتابة.</p>
+                        <dl>
+                            <div>
+                                <dt>التصنيف</dt>
+                                <dd id="previewCategory">-</dd>
+                            </div>
+                            <div>
+                                <dt>الرسوم</dt>
+                                <dd id="previewFees">-</dd>
+                            </div>
+                            <div>
+                                <dt>المدة</dt>
+                                <dd id="previewTime">-</dd>
+                            </div>
+                        </dl>
+                        <div>
+                            <strong>المستندات</strong>
+                            <ul id="previewDocuments"></ul>
+                        </div>
+                        <div>
+                            <strong>الخطوات</strong>
+                            <ol id="previewSteps"></ol>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </form>
     </div>
 
     <script src="/static/js/service_validation.js"></script>
-    
+    <script src="/static/js/service_form_experience.js"></script>
 </body>
 </html>

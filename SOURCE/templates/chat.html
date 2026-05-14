@@ -4,45 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>بوابة الخدمات الحكومية</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/style.css?v=chat-modern-20260514f">
+    <link rel="icon" type="image/png" href="/static/img/gsh-logo-mark.png?v=logo-20260514">
 </head>
 <body>
-    <div class="app-shell">
+    <div class="app-shell chat-modern-shell sidebar-collapsed">
+        <button id="services-toggle" class="floating-services-toggle" type="button" aria-label="فتح قائمة الخدمات" aria-expanded="false" aria-controls="services-drawer">
+            <img class="toggle-logo" src="/static/img/gsh-logo-mark.png?v=logo-20260514" alt="">
+            <span class="toggle-menu" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+            </span>
+        </button>
+        <main class="chat-workspace">
+            <div id="drawer-overlay" class="drawer-overlay"></div>
 
-        <header class="topbar">
-
-            <div class="brand">
-                <div class="brand-text">
-                    <h1>بوابة الخدمات الحكومية</h1>
-                    <p>Government Services Hub</p>
+            <aside class="services-drawer" id="services-drawer">
+                <div class="drawer-brand">
+                    <img class="brand-logo" src="/static/img/gsh-logo-mark.png?v=logo-20260514" alt="GSH">
+                    <div class="brand-text">
+                        <h1>بوابة الخدمات الحكومية</h1>
+                        <p>مساعد ذكي للوصول إلى الخدمات بسرعة</p>
+                    </div>
+                    <button id="drawer-close" class="drawer-collapse-btn" type="button" aria-label="تصغير قائمة الخدمات">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
                 </div>
-            </div>
 
-            <div class="topbar-left">
-                <a href="/admin/dashboard" class="nav-btn">لوحة التحكم</a>
-                <button id="theme-toggle" class="icon-btn">🌙</button>
-            </div>
+                <div class="drawer-actions">
+                    <a href="/admin/dashboard" class="nav-btn">لوحة التحكم</a>
+                    <button id="theme-toggle" class="icon-btn" type="button">الوضع الداكن</button>
+                </div>
 
-        </header>
-
-        <section class="welcome-banner">
-            <div class="welcome-text">
-                <h2>هلا، جيت اساعدك توصل لاي خدمة حكومية</h2>
-                <p>اسألني عن أي خدمة تبغاها، او اختر من قائمة الخدمات السريعة تحت</p>
-            </div>
-        </section>
-
-        <main class="main-layout">
-            <aside class="quick-services">
-
-                <div class="sidebar-search">
+                <div class="sidebar-search modern-service-search">
                     <div class="search-wrapper">
-                        <span class="search-icon">🔍</span>
+                        <span class="search-icon">بحث</span>
                         <input
                             type="text"
                             id="services-search"
                             class="search-input"
-                            placeholder="ابحث عن خدمة..."
+                            placeholder="ابحث عن خدمة أو تصنيف"
                             oninput="searchServices()"
                             autocomplete="off"
                         >
@@ -51,59 +55,60 @@
                 </div>
 
                 <div id="quick-section">
-                    <div class="section-header">
-                        <h3>الخدمات الأكثر طلبًا</h3>
+                    <div class="drawer-section-title">
+                        <h3>الأكثر طلبًا</h3>
+                        <span>اختصر وقتك بالبدء من خدمة شائعة</span>
                     </div>
 
-                    <div class="search-results-list">
+                    <div class="search-results-list modern-services-list">
                         {% for service in quick_services %}
                             <button
-                                class="search-result-item"
+                                class="search-result-item service-drawer-item"
                                 data-name="{{ service['service_name'] }}"
                                 onclick="sendQuickMessage(this.dataset.name)"
                             >
                                 <span class="result-name">{{ service['service_name'] }}</span>
-                                <span class="result-category">{{ service['category'] if service['category'] else '' }}</span>
+                                <span class="result-category">{{ service['category'] if service['category'] else 'خدمة حكومية' }}</span>
                             </button>
                         {% endfor %}
                     </div>
                 </div>
 
                 <div id="search-results-section" style="display:none;">
-                    <div class="section-header">
+                    <div class="drawer-section-title">
                         <h3>نتائج البحث</h3>
+                        <span>اختر خدمة لإرسالها مباشرة للمساعد</span>
                     </div>
-                    <div class="search-results-list" id="search-results-list">
-                    </div>
+                    <div class="search-results-list modern-services-list" id="search-results-list"></div>
                     <div class="no-results" id="no-results" style="display:none;">
                         لا توجد خدمات مطابقة
                     </div>
                 </div>
-
             </aside>
 
-            <section class="chat-panel">
+            <section class="chat-panel modern-chat-panel">
                 <div class="chat-box" id="chat-box">
                     <div class="message bot-message">
+                        <div class="message-avatar">G</div>
                         <div class="message-content">
-                            <p>هلا والله! ايش الخدمة اللي تبحث عنها؟</p>
+                            <p>هلا! اكتب الخدمة اللي تحتاجها أو افتح قائمة الخدمات من الجانب، وأنا أرتب لك التفاصيل والخطوات.</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="input-panel">
-                    <button class="send-btn" onclick="sendMessage()">إرسال</button>
-                    <input
-                        type="text"
+                <div class="input-panel modern-composer">
+                    <textarea
                         id="user-input"
+                        rows="1"
                         placeholder="اكتب سؤالك هنا..."
                         onkeydown="handleKeyPress(event)"
-                    >
+                    ></textarea>
+                    <button class="send-btn" onclick="sendMessage()">إرسال</button>
                 </div>
             </section>
         </main>
     </div>
 
-    <script src="/static/js/chat.js"></script>
+    <script src="/static/js/chat.js?v=chat-modern-20260514f"></script>
 </body>
 </html>

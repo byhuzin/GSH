@@ -3,48 +3,47 @@ document.addEventListener("DOMContentLoaded", function () {
     const feesError = document.getElementById("fees-error");
     const intentNameInput = document.getElementById("intent_name");
     const intentNameError = document.getElementById("intent-name-error");
+    const estimatedTimeInput = document.getElementById("estimated_time");
+    const estimatedTimeError = document.getElementById("estimated-time-error");
+    const estimatedTimeUnit = document.getElementById("estimated_time_unit");
+    const estimatedTimeUnitError = document.getElementById("estimated-time-unit-error");
     const form = document.querySelector("form");
+    let submittingAfterValidation = false;
 
     if (!feesInput || !feesError || !form) return;
 
+    function showError(element, message) {
+        if (!element) return;
+        element.textContent = message;
+        element.style.display = "block";
+    }
+
+    function hideError(element) {
+        if (!element) return;
+        element.style.display = "none";
+    }
+
     function isValidNumber(value) {
         const trimmed = value.trim();
-        if (trimmed === "") return false;
-        return !isNaN(trimmed) && Number(trimmed) >= 0;
+        return trimmed !== "" && !isNaN(trimmed) && Number(trimmed) >= 0;
     }
 
     function validateFees() {
         const value = feesInput.value.trim();
 
         if (value === "") {
-            feesError.textContent = "هذا الحقل مطلوب";
-            feesError.style.display = "block";
+            showError(feesError, "هذا الحقل مطلوب");
             return false;
         }
 
         if (!isValidNumber(value)) {
-            feesError.textContent = "يجب إدخال رقم فقط";
-            feesError.style.display = "block";
+            showError(feesError, "يجب إدخال رقم فقط");
             return false;
         }
 
-        feesError.style.display = "none";
+        hideError(feesError);
         return true;
     }
-
-    feesInput.addEventListener("blur", validateFees);
-
-    feesInput.addEventListener("input", function () {
-        if (feesInput.value.trim() === "" || isValidNumber(feesInput.value)) {
-            feesError.style.display = "none";
-        }
-    });
-
-    const estimatedTimeInput = document.getElementById("estimated_time");
-    const estimatedTimeError = document.getElementById("estimated-time-error");
-
-    const estimatedTimeUnit = document.getElementById("estimated_time_unit");
-    const estimatedTimeUnitError = document.getElementById("estimated-time-unit-error");
 
     function isValidInteger(value) {
         return /^\d+$/.test(value.trim());
@@ -56,18 +55,16 @@ document.addEventListener("DOMContentLoaded", function () {
         const value = estimatedTimeInput.value.trim();
 
         if (value === "") {
-            estimatedTimeError.textContent = "هذا الحقل مطلوب";
-            estimatedTimeError.style.display = "block";
+            showError(estimatedTimeError, "هذا الحقل مطلوب");
             return false;
         }
 
         if (!isValidInteger(value)) {
-            estimatedTimeError.textContent = "يجب إدخال رقم فقط";
-            estimatedTimeError.style.display = "block";
+            showError(estimatedTimeError, "يجب إدخال رقم فقط");
             return false;
         }
 
-        estimatedTimeError.style.display = "none";
+        hideError(estimatedTimeError);
         return true;
     }
 
@@ -75,11 +72,11 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!estimatedTimeUnit || !estimatedTimeUnitError) return true;
 
         if (estimatedTimeUnit.value.trim() === "") {
-            estimatedTimeUnitError.style.display = "block";
+            showError(estimatedTimeUnitError, "يجب اختيار وحدة الوقت");
             return false;
         }
 
-        estimatedTimeUnitError.style.display = "none";
+        hideError(estimatedTimeUnitError);
         return true;
     }
 
@@ -93,59 +90,68 @@ document.addEventListener("DOMContentLoaded", function () {
         const value = intentNameInput.value.trim();
 
         if (value === "") {
-            intentNameError.textContent = "هذا الحقل مطلوب";
-            intentNameError.style.display = "block";
+            showError(intentNameError, "هذا الحقل مطلوب");
             return false;
         }
 
         if (!isValidIntentName(value)) {
-            intentNameError.textContent = "يجب ان يتكون اسم ال Intent من أحرف إنجليزية فقط";
-            intentNameError.style.display = "block";
+            showError(intentNameError, "يجب أن يبدأ اسم الـ Intent بحرف إنجليزي ويحتوي على أحرف إنجليزية وأرقام وشرطة سفلية فقط");
             return false;
         }
 
-        intentNameError.style.display = "none";
+        hideError(intentNameError);
         return true;
     }
 
     async function validateIntentName() {
-        if (!validateIntentNameFormat()) {
-            return false;
-        }
+        if (!validateIntentNameFormat()) return false;
+        if (intentNameInput.readOnly) return true;
 
-        let url ="/admin/services/check-intent?intent_name=" + encodeURIComponent(intentNameInput.value.trim());
+        let url = "/admin/services/check-intent?intent_name=" + encodeURIComponent(intentNameInput.value.trim());
         const serviceId = intentNameInput.dataset.serviceId;
+
         if (serviceId) {
-            url += "&service_id=" + serviceId;
+            url += "&service_id=" + encodeURIComponent(serviceId);
         }
 
         try {
-            const response = await fetch(url);
+            const response = await fetch(url, {
+                headers: {
+                    "Accept": "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error("Intent check failed");
+            }
+
             const data = await response.json();
+
             if (data.exists) {
-                intentNameError.textContent ="اسم الـ Intent مستخدم مسبقًا";
-                intentNameError.style.display = "block";
+                showError(intentNameError, "اسم الـ Intent مستخدم مسبقًا");
                 return false;
             }
-            intentNameError.style.display = "none";
-            return true;
 
+            hideError(intentNameError);
+            return true;
         } catch (error) {
-            intentNameError.textContent ="تعذر التحقق من اسم الـ Intent، حاول مرة أخرى";
-            intentNameError.style.display = "block";
+            showError(intentNameError, "تعذر التحقق من اسم الـ Intent، حاول مرة أخرى");
             return false;
         }
     }
 
+    feesInput.addEventListener("blur", validateFees);
+    feesInput.addEventListener("input", function () {
+        if (feesInput.value.trim() === "" || isValidNumber(feesInput.value)) {
+            hideError(feesError);
+        }
+    });
+
     if (estimatedTimeInput) {
         estimatedTimeInput.addEventListener("blur", validateEstimatedTime);
-
         estimatedTimeInput.addEventListener("input", function () {
-            if (
-                estimatedTimeInput.value.trim() === "" ||
-                isValidInteger(estimatedTimeInput.value)
-            ) {
-                estimatedTimeError.style.display = "none";
+            if (estimatedTimeInput.value.trim() === "" || isValidInteger(estimatedTimeInput.value)) {
+                hideError(estimatedTimeError);
             }
         });
     }
@@ -156,16 +162,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (intentNameInput) {
         intentNameInput.addEventListener("blur", validateIntentName);
-
         intentNameInput.addEventListener("input", function () {
             if (intentNameInput.value.trim() === "" || isValidIntentName(intentNameInput.value)) {
-                intentNameError.style.display = "none";
+                hideError(intentNameError);
             }
         });
     }
 
-    form.addEventListener("submit", async function (e) {
-        e.preventDefault();
+    form.addEventListener("submit", async function (event) {
+        if (submittingAfterValidation) return;
+
+        event.preventDefault();
 
         const validFees = validateFees();
         const validTime = validateEstimatedTime();
@@ -173,23 +180,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const validIntentNameFormat = validateIntentNameFormat();
 
         if (!validFees || !validTime || !validUnit || !validIntentNameFormat) {
-
-            if (!validFees) {
-                feesInput.focus();
-            }
-
-            else if (!validTime) {
-                estimatedTimeInput.focus();
-            }
-
-            else if (!validUnit) {
-                estimatedTimeUnit.focus();
-            }
-
-            else if (!validIntentNameFormat) {
-                intentNameInput.focus();
-            }
-
+            if (!validFees) feesInput.focus();
+            else if (!validTime) estimatedTimeInput.focus();
+            else if (!validUnit) estimatedTimeUnit.focus();
+            else if (!validIntentNameFormat) intentNameInput.focus();
             return;
         }
 
@@ -200,7 +194,12 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        form.submit();
+        submittingAfterValidation = true;
 
+        if (form.requestSubmit) {
+            form.requestSubmit();
+        } else {
+            form.submit();
+        }
     });
 });

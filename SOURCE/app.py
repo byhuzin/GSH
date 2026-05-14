@@ -20,7 +20,8 @@ from db import (
     get_top_requested_services,
     search_services,
     intent_name_exists,
-    get_all_services_for_admin
+    get_all_services_for_admin,
+    get_service_usage_stats
 )
 from rasa_sync import sync_service_to_rasa
 
@@ -338,7 +339,16 @@ def admin_dashboard():
 @admin_required
 def manage_services():
     services = get_all_services_for_admin()
-    return render_template("manage_services.html", services=services)
+    active_services_count = sum(1 for service in services if service["is_active"] == 1)
+    inactive_services_count = len(services) - active_services_count
+
+    return render_template(
+        "manage_services.html",
+        services=services,
+        total_services_count=len(services),
+        active_services_count=active_services_count,
+        inactive_services_count=inactive_services_count
+    )
 
 
 @app.route("/admin/services/check-intent")
@@ -408,7 +418,14 @@ def edit_service_page(service_id):
             except Exception as e:
                 error = f"حدث خطأ أثناء تعديل الخدمة: {str(e)}"
 
-    return render_template("edit_service.html", service=service, error=error)
+    service_stats = get_service_usage_stats(service_id)
+
+    return render_template(
+        "edit_service.html",
+        service=service,
+        service_stats=service_stats,
+        error=error
+    )
 
 
 @app.route("/admin/services/<int:service_id>/status/<int:is_active>", methods=["POST"])
