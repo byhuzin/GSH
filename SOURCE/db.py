@@ -166,6 +166,16 @@ def get_all_services():
     return services
 
 
+def get_all_services_for_admin():
+    with closing(get_connection()) as conn:
+        services = conn.execute("""
+            SELECT * FROM services
+            ORDER BY id DESC
+        """).fetchall()
+
+    return services
+
+
 def get_service_by_intent(intent_name: str):
     with closing(get_connection()) as conn:
         service = conn.execute("""
@@ -246,15 +256,15 @@ def update_service(service_id: int, service_data: dict):
             ))
 
 
-def delete_service(service_id: int):
+def set_service_active(service_id: int, is_active: int):
     with closing(get_connection()) as conn:
         with conn:
             conn.execute("""
                 UPDATE services
-                SET is_active = 0,
+                SET is_active = ?,
                     updated_at = CURRENT_TIMESTAMP
                 WHERE id = ?
-            """, (service_id,))
+            """, (is_active, service_id))
 
 
 def save_message(session_id: str, user_message: str, detected_intent: str = None,
@@ -291,7 +301,16 @@ def get_dashboard_stats():
 
         total_services = conn.execute("""
             SELECT COUNT(*) AS count FROM services
+        """).fetchone()["count"]
+
+        active_services = conn.execute("""
+            SELECT COUNT(*) AS count FROM services
             WHERE is_active = 1
+        """).fetchone()["count"]
+
+        inactive_services = conn.execute("""
+            SELECT COUNT(*) AS count FROM services
+            WHERE is_active = 0
         """).fetchone()["count"]
 
         positive_feedback = conn.execute("""
@@ -314,23 +333,81 @@ def get_dashboard_stats():
             LIMIT 5
         """).fetchall()
 
+        service_stats_rows = conn.execute("""
+            SELECT
+                s.id,
+                s.service_name,
+                s.category,
+                s.intent_name,
+                s.is_active,
+                COALESCE(requests.request_count, 0) AS request_count,
+                COALESCE(feedback_stats.positive_feedback, 0) AS positive_feedback,
+                COALESCE(feedback_stats.negative_feedback, 0) AS negative_feedback,
+                COALESCE(feedback_stats.total_feedback, 0) AS total_feedback
+            FROM services s
+            LEFT JOIN (
+                SELECT service_id, COUNT(*) AS request_count
+                FROM messages
+                WHERE service_id IS NOT NULL
+                GROUP BY service_id
+            ) requests ON requests.service_id = s.id
+            LEFT JOIN (
+                SELECT
+                    m.service_id,
+                    SUM(CASE WHEN f.rating = 1 THEN 1 ELSE 0 END) AS positive_feedback,
+                    SUM(CASE WHEN f.rating = 0 THEN 1 ELSE 0 END) AS negative_feedback,
+                    COUNT(f.id) AS total_feedback
+                FROM feedback f
+                JOIN messages m ON f.message_id = m.id
+                WHERE m.service_id IS NOT NULL
+                GROUP BY m.service_id
+            ) feedback_stats ON feedback_stats.service_id = s.id
+            ORDER BY request_count DESC, total_feedback DESC, s.service_name
+        """).fetchall()
+
         total_feedback = positive_feedback + negative_feedback
 
         if total_feedback > 0:
             satisfaction_rate = round((positive_feedback / total_feedback) * 100, 2)
         else:
             satisfaction_rate = 0
-        
-        
+
+        service_stats = []
+
+        for service in service_stats_rows:
+            service_total_feedback = service["total_feedback"]
+            service_satisfaction_rate = 0
+
+            if service_total_feedback > 0:
+                service_satisfaction_rate = round(
+                    (service["positive_feedback"] / service_total_feedback) * 100,
+                    2
+                )
+
+            service_stats.append({
+                "id": service["id"],
+                "service_name": service["service_name"],
+                "category": service["category"] or "",
+                "intent_name": service["intent_name"],
+                "is_active": service["is_active"],
+                "request_count": service["request_count"],
+                "positive_feedback": service["positive_feedback"],
+                "negative_feedback": service["negative_feedback"],
+                "total_feedback": service_total_feedback,
+                "satisfaction_rate": service_satisfaction_rate
+            })
 
     return {
-    "total_messages": total_messages,
-    "total_services": total_services,
-    "positive_feedback": positive_feedback,
-    "negative_feedback": negative_feedback,
-    "satisfaction_rate": satisfaction_rate,
-    "most_requested_services": most_requested_services
-}
+        "total_messages": total_messages,
+        "total_services": total_services,
+        "active_services": active_services,
+        "inactive_services": inactive_services,
+        "positive_feedback": positive_feedback,
+        "negative_feedback": negative_feedback,
+        "satisfaction_rate": satisfaction_rate,
+        "most_requested_services": most_requested_services,
+        "service_stats": service_stats
+    }
 
 def get_top_requested_services(limit=6):
     with closing(get_connection()) as conn:

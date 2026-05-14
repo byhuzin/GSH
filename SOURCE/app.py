@@ -14,12 +14,13 @@ from db import (
     add_service,
     get_service_by_id,
     update_service,
-    delete_service,
+    set_service_active,
     save_feedback,
     get_service_by_name,
     get_top_requested_services,
     search_services,
-    intent_name_exists
+    intent_name_exists,
+    get_all_services_for_admin
 )
 from rasa_sync import sync_service_to_rasa
 
@@ -323,17 +324,20 @@ def admin_dashboard():
         "admin_dashboard.html",
         total_messages=stats["total_messages"],
         total_services=stats["total_services"],
+        active_services=stats["active_services"],
+        inactive_services=stats["inactive_services"],
         positive_feedback=stats["positive_feedback"],
         negative_feedback=stats["negative_feedback"],
         satisfaction_rate=stats["satisfaction_rate"],
-        most_requested_services=stats["most_requested_services"]
+        most_requested_services=stats["most_requested_services"],
+        service_stats=stats["service_stats"]
     )
 
 
 @app.route("/admin/services")
 @admin_required
 def manage_services():
-    services = get_all_services()
+    services = get_all_services_for_admin()
     return render_template("manage_services.html", services=services)
 
 
@@ -407,17 +411,31 @@ def edit_service_page(service_id):
     return render_template("edit_service.html", service=service, error=error)
 
 
-@app.route("/admin/services/delete/<int:service_id>")
+@app.route("/admin/services/<int:service_id>/status/<int:is_active>", methods=["POST"])
 @admin_required
-def delete_service_page(service_id):
+def update_service_status_page(service_id, is_active):
     service = get_service_by_id(service_id)
 
     if not service:
         return "الخدمة غير موجودة", 404
 
-    intent_name = service["intent_name"]
-    delete_service(service_id)
-    sync_service_to_rasa(intent=intent_name, keywords="", action="delete")
+    if is_active not in (0, 1):
+        return "حالة الخدمة غير صحيحة", 400
+
+    set_service_active(service_id, is_active)
+
+    if is_active == 1:
+        sync_service_to_rasa(
+            intent=service["intent_name"],
+            keywords=service["keywords"],
+            action="update"
+        )
+    else:
+        sync_service_to_rasa(
+            intent=service["intent_name"],
+            keywords="",
+            action="delete"
+        )
 
     return redirect(url_for("manage_services"))
 

@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
@@ -7,10 +7,11 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <div class="page-wrapper admin-page">
+    <div class="page-wrapper admin-page dashboard-page">
         <div class="page-topbar">
             <div class="page-title">
-                <h1>لوحة التحكم </h1>
+                <h1>لوحة التحكم</h1>
+                <p>متابعة أداء الخدمات ورضا المستخدمين</p>
             </div>
 
             <div class="page-actions">
@@ -20,15 +21,20 @@
             </div>
         </div>
 
-        <div class="stats-grid">
+        <div class="stats-grid dashboard-summary-grid">
             <div class="stat-card">
                 <h3>عدد الرسائل</h3>
                 <p>{{ total_messages }}</p>
             </div>
 
             <div class="stat-card">
-                <h3>عدد الخدمات</h3>
+                <h3>إجمالي الخدمات</h3>
                 <p>{{ total_services }}</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>الخدمات النشطة</h3>
+                <p>{{ active_services }}</p>
             </div>
 
             <div class="stat-card">
@@ -42,41 +48,101 @@
             </div>
 
             <div class="stat-card">
-                <h3>نسبة رضا المستخدم</h3>
+                <h3>نسبة الرضا</h3>
                 <p>{{ satisfaction_rate }}%</p>
             </div>
         </div>
 
-        
+        <div class="dashboard-controls">
+            <input type="search" id="serviceStatsSearch" class="dashboard-search" placeholder="ابحث عن خدمة أو تصنيف أو Intent">
 
-        <div class="table-card">
-            <div class="section-header">
-                <h3>الخدمات الأكثر طلبًا</h3>
+            <div class="dashboard-filter-group" aria-label="تصفية الخدمات">
+                <button type="button" class="dashboard-filter active" data-filter="all">الكل</button>
+                <button type="button" class="dashboard-filter" data-filter="active">نشطة</button>
+                <button type="button" class="dashboard-filter" data-filter="inactive">معطلة</button>
             </div>
 
-            <table class="styled-table">
-                <thead>
-                    <tr>
-                        <th>الخدمة</th>
-                        <th>عدد الطلبات</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if most_requested_services %}
-                        {% for item in most_requested_services %}
-                            <tr>
-                                <td>{{ item['service_name'] }}</td>
-                                <td>{{ item['request_count'] }}</td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr>
-                            <td colspan="2">لا توجد بيانات بعد</td>
-                        </tr>
-                    {% endif %}
-                </tbody>
-            </table>
+            <select id="serviceStatsSort" class="dashboard-sort" aria-label="ترتيب الخدمات">
+                <option value="requests">الأكثر طلبًا</option>
+                <option value="satisfaction">الأعلى رضا</option>
+                <option value="positive">الأكثر تقييمًا إيجابيًا</option>
+                <option value="negative">الأكثر تقييمًا سلبيًا</option>
+                <option value="name">اسم الخدمة</option>
+            </select>
         </div>
+
+        <div class="dashboard-analytics-grid">
+            <section class="analytics-panel services-ranking-panel">
+                <div class="section-header">
+                    <h3>إحصائيات الخدمات</h3>
+                    <span id="visibleServicesCount" class="analytics-count"></span>
+                </div>
+
+                <div id="servicesStatsList" class="services-stats-list"></div>
+                <div id="servicesStatsEmpty" class="dashboard-empty-state">لا توجد خدمات مطابقة</div>
+            </section>
+
+            <section class="analytics-panel service-detail-panel">
+                <div class="section-header">
+                    <div>
+                        <h3 id="selectedServiceName">الخدمة</h3>
+                        <p id="selectedServiceMeta" class="dashboard-muted"></p>
+                    </div>
+                    <span id="selectedServiceStatus" class="status-badge"></span>
+                </div>
+
+                <div class="service-detail-metrics">
+                    <div>
+                        <span>عدد الطلبات</span>
+                        <strong id="selectedRequests">0</strong>
+                    </div>
+                    <div>
+                        <span>إيجابي</span>
+                        <strong id="selectedPositive">0</strong>
+                    </div>
+                    <div>
+                        <span>سلبي</span>
+                        <strong id="selectedNegative">0</strong>
+                    </div>
+                    <div>
+                        <span>الرضا</span>
+                        <strong id="selectedSatisfaction">0%</strong>
+                    </div>
+                </div>
+
+                <div class="visual-metric-block">
+                    <div class="metric-line">
+                        <span>نسبة الرضا</span>
+                        <strong id="selectedSatisfactionLabel">0%</strong>
+                    </div>
+                    <div class="progress-track">
+                        <div id="selectedSatisfactionBar" class="progress-fill satisfaction-fill"></div>
+                    </div>
+                </div>
+
+                <div class="visual-metric-block">
+                    <div class="metric-line">
+                        <span>توزيع التقييمات</span>
+                        <strong id="selectedFeedbackTotal">0 تقييم</strong>
+                    </div>
+                    <div class="feedback-split-bar">
+                        <div id="selectedPositiveShare" class="feedback-positive"></div>
+                        <div id="selectedNegativeShare" class="feedback-negative"></div>
+                    </div>
+                </div>
+
+                <div class="top-services-chart-wrap">
+                    <div class="section-header compact">
+                        <h3>أعلى الخدمات طلبًا</h3>
+                    </div>
+                    <div id="topServicesChart" class="top-services-chart"></div>
+                </div>
+            </section>
+        </div>
+
+        <script id="serviceStatsData" type="application/json">{{ service_stats|tojson }}</script>
     </div>
+
+    <script src="/static/js/admin_dashboard.js"></script>
 </body>
 </html>

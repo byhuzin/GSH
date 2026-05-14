@@ -27,6 +27,7 @@
                         <th>اسم الخدمة</th>
                         <th>التصنيف</th>
                         <th>اسم الـ Intent</th>
+                        <th>حالة الخدمة</th>
                         <th>الإجراءات</th>
                     </tr>
                 </thead>
@@ -37,19 +38,35 @@
                                 <td>{{ service['service_name'] }}</td>
                                 <td>{{ service['category'] }}</td>
                                 <td>{{ service['intent_name'] }}</td>
+                                <td>
+                                    {% if service['is_active'] == 1 %}
+                                        <span class="status-badge active">نشطة</span>
+                                    {% else %}
+                                        <span class="status-badge inactive">معطلة</span>
+                                    {% endif %}
+                                </td>
                                 <td class="actions-cell">
                                     <a href="/admin/services/edit/{{ service['id'] }}" class="table-link">تعديل</a>
-                                    <a href="/admin/services/delete/{{ service['id'] }}"
-                                        class="delete-btn"
-                                        onclick="return confirm('هل أنت متأكد من حذف هذه الخدمة؟');">
-                                         حذف
-                                    </a>
+                                    {% if service['is_active'] == 1 %}
+                                        <form method="POST" action="/admin/services/{{ service['id'] }}/status/0" class="inline-action-form">
+                                            <button type="submit" class="status-action-btn deactivate-btn"
+                                                onclick="return confirm('هل أنت متأكد من تعطيل هذه الخدمة؟');">
+                                                تعطيل
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <form method="POST" action="/admin/services/{{ service['id'] }}/status/1" class="inline-action-form">
+                                            <button type="submit" class="status-action-btn activate-btn">
+                                                تنشيط
+                                            </button>
+                                        </form>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="4">لا توجد خدمات متاحة</td>
+                            <td colspan="5">لا توجد خدمات في النظام</td>
                         </tr>
                     {% endif %}
                 </tbody>
