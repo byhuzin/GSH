@@ -3,37 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول  </title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <title>تسجيل الدخول</title>
+    <link rel="stylesheet" href="/static/css/style.css?v=site-logo-auth-20260515">
+    <link rel="icon" type="image/png" href="/static/img/gsh-logo-mark.png?v=logo-20260514">
 </head>
-<body>
-    <div class="page-wrapper">
-        <div class="form-card auth-card">
-            <div class="page-title">
-                <h1>تسجيل الدخول للوحة التحكم</h1>
-                <p>ادخل بياناتك للوصول للوحة التحكم</p>
-            </div>
+<body class="auth-body">
+    <div class="page-wrapper auth-page">
+        <div class="auth-layout">
+            <section class="auth-brand-panel">
+                <a href="/" class="site-logo-link auth-logo-link" aria-label="العودة لواجهة الموقع">
+                    <img src="/static/img/gsh-logo-mark.png?v=logo-20260514" alt="GSH">
+                    <span>
+                        <strong>بوابة الخدمات الحكومية</strong>
+                        <small>مساعد ذكي للوصول إلى الخدمات بسرعة</small>
+                    </span>
+                </a>
+                <div class="auth-panel-copy">
+                    <span class="eyebrow">لوحة التحكم</span>
+                    <h1>إدارة الخدمات بواجهة موحدة</h1>
+                    <p>تابع الأداء، حدّث الخدمات، وراجع تجربة المستخدمين من مكان واحد.</p>
+                </div>
+            </section>
 
-            {% if error %}
-                <div class="alert-error">{{ error }}</div>
-            {% endif %}
-
-            <form method="POST" class="styled-form">
-                <div class="form-group">
-                    <label>اسم المستخدم</label>
-                    <input type="text" name="username" required>
+            <div class="form-card auth-card modern-auth-card">
+                <div class="page-title">
+                    <span class="eyebrow">دخول آمن</span>
+                    <h1>تسجيل الدخول</h1>
+                    <p>ادخل بيانات المسؤول للوصول إلى لوحة التحكم.</p>
                 </div>
 
-                <div class="form-group">
-                    <label>كلمة المرور</label>
-                    <input type="password" name="password" required>
+                {% if error %}
+                    <div class="alert-error">{{ error }}</div>
+                {% endif %}
+
+                <form method="POST" class="styled-form">
+                    <div class="form-group">
+                        <label>اسم المستخدم</label>
+                        <input type="text" name="username" autocomplete="username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>كلمة المرور</label>
+                        <input type="password" name="password" autocomplete="current-password" required>
+                    </div>
+
+                    <button type="submit" class="primary-btn full-width">دخول</button>
+                </form>
+
+                <div class="page-actions center-actions">
+                    <a href="/" class="secondary-link">العودة للواجهة الرئيسية</a>
                 </div>
-
-                <button type="submit" class="primary-btn full-width">دخول</button>
-            </form>
-
-            <div class="page-actions center-actions">
-                <a href="/" class="secondary-link">العودة للرئيسية</a>
             </div>
         </div>
     </div>

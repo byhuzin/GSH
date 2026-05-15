@@ -2604,7 +2604,14 @@ body.admin-body .page-wrapper.admin-page {
 
 .chat-modern-shell.drawer-open .floating-services-toggle {
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
+}
+
+.chat-modern-shell.sidebar-collapsed .floating-services-toggle {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
 }
 
 /* Right logo rail and simplified drawer controls. */
@@ -2755,5 +2762,208 @@ body.admin-body .page-wrapper.admin-page {
 
     .chat-modern-shell.drawer-open .drawer-overlay {
         display: none;
+    }
+}
+
+/* Shared clickable logo and refreshed admin login. */
+.site-logo-link {
+    width: 58px;
+    height: 58px;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    background: var(--surface-color);
+    box-shadow: var(--shadow);
+    text-decoration: none;
+    transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.site-logo-link:hover,
+.site-logo-link:focus-visible {
+    border-color: var(--primary-color);
+    background: var(--surface-soft);
+    transform: translateY(-1px);
+}
+
+.site-logo-link img {
+    width: 46px;
+    height: 46px;
+    object-fit: contain;
+    display: block;
+}
+
+.page-topbar .page-title {
+    flex: 1;
+    min-width: 240px;
+}
+
+.drawer-logo-link {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    box-shadow: none;
+}
+
+.drawer-logo-link img {
+    width: 42px;
+    height: 42px;
+}
+
+.auth-body {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top right, rgba(47, 107, 61, 0.12), transparent 32rem),
+        linear-gradient(180deg, var(--surface-soft), var(--bg-color) 42%);
+}
+
+.auth-page {
+    min-height: 100vh;
+    max-width: 1120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-layout {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 430px);
+    gap: 18px;
+    align-items: stretch;
+}
+
+.auth-brand-panel,
+.modern-auth-card {
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.84);
+    box-shadow: var(--shadow);
+}
+
+.auth-brand-panel {
+    min-height: 420px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+.auth-logo-link {
+    width: auto;
+    height: auto;
+    justify-content: flex-start;
+    gap: 12px;
+    align-self: flex-start;
+    padding: 10px 12px;
+}
+
+.auth-logo-link span {
+    display: grid;
+    gap: 3px;
+    color: var(--text-color);
+}
+
+.auth-logo-link strong {
+    color: var(--primary-color);
+    font-size: 16px;
+}
+
+.auth-logo-link small {
+    color: var(--muted-text);
+    font-size: 12px;
+}
+
+.auth-panel-copy h1 {
+    margin: 0 0 12px;
+    max-width: 520px;
+    color: var(--primary-color);
+    font-size: 34px;
+    line-height: 1.35;
+}
+
+.auth-panel-copy p {
+    margin: 0;
+    max-width: 520px;
+    color: var(--muted-text);
+    line-height: 1.9;
+}
+
+.modern-auth-card {
+    max-width: none;
+    margin: 0;
+    padding: 28px;
+}
+
+.modern-auth-card .page-title {
+    margin-bottom: 22px;
+}
+
+.modern-auth-card .styled-form {
+    display: grid;
+    gap: 16px;
+}
+
+.modern-auth-card input {
+    min-height: 48px;
+    background: var(--surface-soft);
+}
+
+.modern-auth-card input:focus {
+    background: var(--surface-color);
+    box-shadow: 0 0 0 3px rgba(47, 107, 61, 0.12);
+}
+
+.modern-auth-card .primary-btn {
+    min-height: 48px;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+.modern-auth-card .center-actions {
+    margin-top: 18px;
+}
+
+body.dark-mode .auth-brand-panel,
+body.dark-mode .modern-auth-card {
+    background: var(--surface-color);
+}
+
+@media (max-width: 900px) {
+    .auth-page {
+        align-items: flex-start;
+    }
+
+    .auth-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-brand-panel {
+        min-height: auto;
+        gap: 42px;
+    }
+
+    .auth-panel-copy h1 {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 640px) {
+    .page-topbar {
+        align-items: flex-start;
+    }
+
+    .site-logo-link {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+    }
+
+    .site-logo-link img {
+        width: 40px;
+        height: 40px;
     }
 }

@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>بوابة الخدمات الحكومية</title>
-    <link rel="stylesheet" href="/static/css/style.css?v=chat-modern-20260514f">
+    <link rel="stylesheet" href="/static/css/style.css?v=chat-default-open-20260515">
     <link rel="icon" type="image/png" href="/static/img/gsh-logo-mark.png?v=logo-20260514">
 </head>
 <body>
-    <div class="app-shell chat-modern-shell sidebar-collapsed">
-        <button id="services-toggle" class="floating-services-toggle" type="button" aria-label="فتح قائمة الخدمات" aria-expanded="false" aria-controls="services-drawer">
+    <div class="app-shell chat-modern-shell drawer-open">
+        <button id="services-toggle" class="floating-services-toggle" type="button" aria-label="إغلاق قائمة الخدمات" aria-expanded="true" aria-controls="services-drawer">
             <img class="toggle-logo" src="/static/img/gsh-logo-mark.png?v=logo-20260514" alt="">
             <span class="toggle-menu" aria-hidden="true">
                 <span></span>
@@ -22,7 +22,9 @@
 
             <aside class="services-drawer" id="services-drawer">
                 <div class="drawer-brand">
-                    <img class="brand-logo" src="/static/img/gsh-logo-mark.png?v=logo-20260514" alt="GSH">
+                    <a href="/" class="site-logo-link drawer-logo-link" aria-label="العودة لواجهة الموقع">
+                        <img class="brand-logo" src="/static/img/gsh-logo-mark.png?v=logo-20260514" alt="GSH">
+                    </a>
                     <div class="brand-text">
                         <h1>بوابة الخدمات الحكومية</h1>
                         <p>مساعد ذكي للوصول إلى الخدمات بسرعة</p>
@@ -109,6 +111,6 @@
         </main>
     </div>
 
-    <script src="/static/js/chat.js?v=chat-modern-20260514f"></script>
+    <script src="/static/js/chat.js?v=chat-default-open-20260515"></script>
 </body>
 </html>
